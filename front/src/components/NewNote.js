@@ -17,6 +17,16 @@ class NewNote extends Component {
         });
     };
 
+    close = () => {
+        this.setState({
+           open: false,
+           nameNote: '',
+           textNote: '',
+        }, () => {
+            this.props.onClosed(false);
+        });
+    };
+
     handleInput = (e) => {
         const name = e.target.name;
         const value = e.target.value;
@@ -35,15 +45,47 @@ class NewNote extends Component {
                 this.props.addNewItem(res.data);
                 this.setState({
                     open: false,
-                })
+                    nameNote: '',
+                    textNote: '',
+                });
             })
             .catch((error) => {
                 console.log(error);
             });
     };
 
+    handleUpdate = () => {
+
+        let data = {
+            name: this.state.nameNote,
+            text: this.state.textNote,
+        };
+
+        axios.post('http://127.0.0.1:8000/notes/' + this.state.idNote, data)
+            .then((res) => {
+                this.setState({
+                    open: false,
+                });
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    componentWillReceiveProps (nextProps) {
+        if(nextProps.open !== this.state.open) {
+            this.setState({
+                open: true,
+                nameNote: nextProps.array[1],
+                textNote: nextProps.array[0],
+                idNote: nextProps.array[2],
+            });
+        }
+    };
+
     render() {
         let { nameNote, textNote, open } = this.state;
+        console.log(this.state.nameNote, this.state.textNote);
         return (
                 <Modal trigger={<Button onClick = {this.show}>Add new note</Button>} open={open}>
                     <Modal.Content>
@@ -57,7 +99,16 @@ class NewNote extends Component {
                                     <Form.TextArea autoHeight placeholder='Text note' onChange={this.handleInput}  name = 'textNote' value={textNote} />
                                 </Form.Field>
                             </Form>
-                            <Button onClick={this.handleClick}>Click</Button>
+                            {
+                                this.props.open &&
+                                    <div>
+                                        <Button onClick={this.handleUpdate}>Edit</Button>
+                                        <Button onClick={this.close}>Cancel</Button>
+                                    </div> || <div>
+                                    <Button onClick={this.handleClick}>Add</Button>
+                                    <Button onClick={this.close}>Cancel</Button>
+                                </div>
+                            }
                         </Modal.Description>
                     </Modal.Content>
                 </Modal>

@@ -9,6 +9,7 @@ class App extends Component {
         super(props);
         this.state = {
             allNotes: [],
+            open: false,
         };
     }
 
@@ -29,23 +30,43 @@ class App extends Component {
         let display = notes.map((item) =>
             <Card id = {item._id} className = 'cardNote'>
                 <Card.Content>
-                    <Card.Meta>
-                        <span className='date'>{item.title}</span>
-                    </Card.Meta>
-                    <Card.Description>{item.text}</Card.Description>
+                    <Card.Header>
+                        <span className='date'>{item.text}</span>
+                    </Card.Header>
+                    <Card.Description>{item.title}</Card.Description>
                 </Card.Content>
                 <Card.Content extra>
-                    <Button>Edit</Button>
+                    <Button onClick={this.handleClick} id = {item._id}>Edit</Button>
                     <Button>Delete</Button>
                 </Card.Content>
             </Card>
         );
         return display;
     };
+
+    handleClick = (e) => {
+        e.preventDefault();
+        console.log(e.target.id);
+        let arrayNote = this.state.allNotes;
+        let editArray = arrayNote.find(items => items._id === e.target.id);
+        console.log(editArray);
+        this.setState({
+            open: true,
+            name: editArray.title,
+            text: editArray.text,
+            idNote: e.target.id,
+        });
+    };
+
     addArray = (value) => {
         this.state.allNotes.push(value);
         this.forceUpdate();
-        console.log(this.state.allNotes);
+    };
+
+    close = (value) => {
+        this.setState({
+            open: value,
+        });
     };
 
   render() {
@@ -54,7 +75,7 @@ class App extends Component {
     return (
       <div className="App">
           {display}
-          <NewNote addNewItem = {this.addArray}/>
+          <NewNote addNewItem = {this.addArray} open = {this.state.open} onClosed = {this.close} array = {[this.state.name, this.state.text, this.state.idNote]}/>
       </div>
     );
   }

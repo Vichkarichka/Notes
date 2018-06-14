@@ -1,4 +1,4 @@
-
+var ObjectID = require('mongodb').ObjectID;
 module.exports = function(app, db) {
 
     app.get('/notes', (req, res) => {
@@ -19,6 +19,19 @@ module.exports = function(app, db) {
                 res.send({ 'error': 'An error has occurred' });
             } else {
                 res.send(result.ops[0]);
+            }
+        });
+    });
+
+    app.post('/notes/:id', (req, res) => {
+        const id = req.params.id;
+        const details = { '_id': new ObjectID(id) };
+        const note = { text: req.body.name, title: req.body.text };
+        db.collection('notes').update(details, note, (err, result) => {
+            if (err) {
+                res.send({'error':'An error has occurred'});
+            } else {
+                res.send(note);
             }
         });
     });
