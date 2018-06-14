@@ -65,7 +65,9 @@ class NewNote extends Component {
             .then((res) => {
                 this.setState({
                     open: false,
-                });
+                }, () =>{
+                    this.props.onDataLoaded();
+                    this.props.onClosed(false);});
             })
             .catch((error) => {
                 console.log(error);
@@ -85,7 +87,7 @@ class NewNote extends Component {
 
     render() {
         let { nameNote, textNote, open } = this.state;
-        console.log(this.state.nameNote, this.state.textNote);
+        console.log(this.state, this.props.open);
         return (
                 <Modal trigger={<Button onClick = {this.show}>Add new note</Button>} open={open}>
                     <Modal.Content>

@@ -12,7 +12,6 @@ class App extends Component {
             open: false,
         };
     }
-
     componentDidMount() {
         axios.get('http://127.0.0.1:8000/notes')
             .then((res) => {
@@ -24,6 +23,18 @@ class App extends Component {
                 console.log(error);
             });
     }
+
+    func = () => {
+        axios.get('http://127.0.0.1:8000/notes')
+            .then((res) => {
+                this.setState({
+                    allNotes: res.data,
+                })
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
 
     displayNote = () => {
         let notes = this.state.allNotes;
@@ -37,7 +48,7 @@ class App extends Component {
                 </Card.Content>
                 <Card.Content extra>
                     <Button onClick={this.handleClick} id = {item._id}>Edit</Button>
-                    <Button>Delete</Button>
+                    <Button onClick={this.handleDelete} id = {item._id}>Delete</Button>
                 </Card.Content>
             </Card>
         );
@@ -58,6 +69,17 @@ class App extends Component {
         });
     };
 
+    handleDelete = (e) => {
+        e.preventDefault();
+        axios.delete('http://127.0.0.1:8000/notes/' + e.target.id)
+            .then((res) => {
+               this.func();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
     addArray = (value) => {
         this.state.allNotes.push(value);
         this.forceUpdate();
@@ -69,13 +91,14 @@ class App extends Component {
         });
     };
 
+
   render() {
 
     let display = this.displayNote();
     return (
       <div className="App">
           {display}
-          <NewNote addNewItem = {this.addArray} open = {this.state.open} onClosed = {this.close} array = {[this.state.name, this.state.text, this.state.idNote]}/>
+          <NewNote addNewItem = {this.addArray} open = {this.state.open} onClosed = {this.close} array = {[this.state.name, this.state.text, this.state.idNote]} onDataLoaded = {this.func}/>
       </div>
     );
   }
